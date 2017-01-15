@@ -1,0 +1,11 @@
+{
+  "name": "dsensor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "url": "git@github.com:song940/dsensor.git",
+    "type": "git"
+  },
+  "author": "Lsong <song940@gmail.com>",
+  "license": "MIT"
+}
