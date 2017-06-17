@@ -20,6 +20,8 @@ sensor.on('data', function(data){
 });
 ```
 
+![](docs/IMG_1705.JPG)
+
 ### Contributing
 - Fork this Repo first
 - Clone your Repo
