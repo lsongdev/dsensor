@@ -11,13 +11,18 @@ const LEN_HEADER     = 2;
 const LEN_LENGTH     = 2;
 const LEN_CHECKSUM   = 2;
 
-
+/**
+* DSensor
+*/
 function DSensor(dev){
   EventEmitter.call(this);
+  if(!(this instanceof DSensor)) return new DSensor(dev);
   var flag = STATE_HEADER_1, index, len, buffer = new Buffer([]);
-  fs.createReadStream(dev).on('data', function(chunk){
+  if(typeof dev === 'undefined') dev = process.stdin;
+  if(typeof dev === 'string') dev = fs.createReadStream(dev);
+  dev.on('data', function(chunk){
     buffer = Buffer.concat([ buffer, chunk ]);
-    for(var i=0;i<buffer.length;i++){
+    for(var i = 0; i < buffer.length; i++){
       if(flag === STATE_HEADER_1 && buffer[i] === STATE_HEADER_1){
         flag = STATE_HEADER_2;
         continue;
@@ -39,10 +44,13 @@ function DSensor(dev){
       }
     }
   }.bind(this));
+  return this;
 }
 
 util.inherits(DSensor, EventEmitter);
-
+/**
+* parse sensor data
+*/
 DSensor.prototype.parse = function(buffer){
   var data = {
     Head    : buffer.readUInt16BE(00),
