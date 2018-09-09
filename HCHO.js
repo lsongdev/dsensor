@@ -1,13 +1,34 @@
+const assert       = require('assert');
 const SerialPort   = require('serialport');
 const createReader = require('./reader');
+
+function parse(buffer){
+  const data = {
+    HEAD    : buffer.readUInt16BE(0),
+    LENGTH  : buffer.readUIntBE(2),
+    TYPE    : buffer.readUIntBE(3),
+    UNIT    : buffer.readUIntBE(4),
+    VH      : buffer.readUIntBE(5),
+    VALUE   : buffer.readUInt16BE(6),
+    CHECKSUM: buffer.readUInt16BE(8),
+  };
+  var checksum = 0;
+  for(var i=0;i<buffer.length - 2;i++){
+    checksum += buffer[i];
+  }
+  assert.equal(data.HEAD, 0x424d, 'Invalid data header');
+  assert.equal(checksum, data.CHECKSUM, 'Checksum error');
+  return data;
+}
 
 class HCHO extends SerialPort {
   constructor(dev){
     super(dev);
     const reader = createReader({
       LEN_LENGTH: 1
-    }, message => {
-      console.log(message);
+    }, data => {
+      const message = parse(data);
+      this.emit('message', message);
     });
     this.on('data', reader);
   }
