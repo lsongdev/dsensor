@@ -32,9 +32,7 @@ function Linear(AQIhigh, AQIlow, Conchigh, Conclow, Concentration){
   return linear;
 }
 
-var sensor = new DSensor('/dev/cu.usbserial')
-.on('data', function(data){
-  
+new DSensor('/dev/cu.usbserial').on('data', function(data){
   var pm25 = data[ 'PM2_5' ];
   console.log(JSON.stringify({
     PM25: pm25,

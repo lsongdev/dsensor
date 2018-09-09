@@ -20,7 +20,7 @@ sensor.on('data', function(data){
 });
 ```
 
-![](docs/IMG_1705.JPG)
+![](docs/PMS5003.jpg)
 
 ### Contributing
 - Fork this Repo first

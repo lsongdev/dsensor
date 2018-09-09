@@ -1,10 +1,5 @@
+const { HCHO } = require('..');
 
-const DSensor = require('..');
+const hc = new HCHO("/dev/xxx");
 
-var sensor = new DSensor('/dev/cu.usbserial');
-
-sensor.on('data', function(data){
-  console.log(data);
-});
-
-
+hc.send(0xe2, 0xaabb);
