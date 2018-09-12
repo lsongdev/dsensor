@@ -1,9 +1,10 @@
 const { HCHO } = require('..');
 
-const hc = new HCHO("/dev/ttyUSB0");
+const hc = new HCHO("/dev/cu.SLAB_USBtoUART");
 
 hc.on('message', message => {
-  console.log(message);
+  const { VALUE, VH } = message;
+  console.log('HCHO: %smg/m3', (VALUE / VH).toFixed(2));
 });
 
 hc.on("open", () => {
