@@ -4,7 +4,7 @@ const hc = new HCHO("/dev/cu.SLAB_USBtoUART");
 
 hc.on('message', message => {
   const { VALUE, VH } = message;
-  console.log('HCHO: %smg/m3', (VALUE / 10**VH).toFixed(2));
+  console.log(VALUE / 10 ** VH, VALUE);
 });
 
 hc.on("open", () => {
@@ -12,3 +12,10 @@ hc.on("open", () => {
     hc.send(0x01, 0x00);
   }, 3000)
 });
+
+
+
+function add(a, b, c){
+  c = a + b;
+  return c;
+}

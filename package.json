@@ -2,6 +2,9 @@
   "name": "dsensor",
   "version": "1.0.0",
   "main": "index.js",
+  "bin": {
+    "dsensor": "bin/dsensor"
+  },
   "repository": {
     "url": "git@github.com:song940/dsensor.git",
     "type": "git"
@@ -9,6 +12,7 @@
   "author": "Lsong <song940@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "serialport": "^7.0.2"
+    "kelp-argv": "latest",
+    "serialport": "latest"
   }
 }

@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+
+const program = require('kelp-argv');
+
+program()
+.command('help', () => {
+  console.log();
+  console.log('~$ dsensor <command> [options]');
+  console.log('~$ dsensor send --type=HCHO --device=/dev/cu.SLAB_USBtoUART --command=query --data=0x00');
+})
+.command('send', ({ type, device, command, data, watch }) => {
+  const Adapter = require(`../${type}`);
+  device = new Adapter(device);
+  device.on('message', message => {
+    console.log(message.toString());
+    if(!watch) device.close();
+  });
+  device.on('open', () => {
+    if(watch){
+      setInterval(() => {
+        device.send(command, data);
+      }, 3000);
+    }else{
+      device.send(command, data);
+    }
+  });
+})
+.parse();
+
