@@ -11,12 +11,18 @@ $ npm i dsensor
 ### Example
 
 ```js
-const Sensor = require('dsensor');
+const { HCHO } = require('dsensor');
 
-var sensor = new Sensor('/dev/cu.usbserial');
+const sensor = new HCHO("/dev/cu.SLAB_USBtoUART");
 
-sensor.on('data', function(data){
-  console.log(data);
+sensor.on('message', message => {
+  console.log(message.toString()); // outputs: "HCHO: 0.001Mg/m3"
+});
+
+sensor.on("open", () => {
+  setInterval(() => {
+    sensor.send('query');
+  }, 3000);
 });
 ```
 

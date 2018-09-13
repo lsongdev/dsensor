@@ -88,7 +88,7 @@ class HCHO extends SerialPort {
     });
     this.on('data', reader);
   }
-  send(cmd, data){
+  send(cmd, data = 0x00){
     let checksum = 0;
     if(typeof cmd === 'undefined')
       throw new TypeError('cmd must be a number or string');

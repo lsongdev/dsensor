@@ -12,10 +12,3 @@ hc.on("open", () => {
     hc.send(0x01, 0x00);
   }, 3000)
 });
-
-
-
-function add(a, b, c){
-  c = a + b;
-  return c;
-}
