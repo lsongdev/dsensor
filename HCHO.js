@@ -38,7 +38,7 @@ const TYPES = {
   0x1d: 'TOX1',
   0x1e: 'TOX2',
   0x1f: 'L/M',
-  0x20: 'BattryLevel',
+  0x20: 'BatteryLevel',
 };
 
 const UNITS = {
