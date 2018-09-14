@@ -1,6 +1,5 @@
 const assert       = require('assert');
 const SerialPort   = require('serialport');
-const createReader = require('./reader');
 
 const COMMANDS = {
   QUERY: 0x01
@@ -50,23 +49,24 @@ const UNITS = {
   0x05: 'Mg/m3',
 };
 
-function parse(buffer){
+function parse(raw){
   const data = {
-    HEAD    : buffer.readUInt16BE(0),
-    LENGTH  : buffer.readUIntBE(2),
-    TYPE    : buffer.readUIntBE(3),
-    UNIT    : buffer.readUIntBE(4),
-    VH      : buffer.readUIntBE(5),
-    VALUE   : buffer.readUInt16BE(6),
-    CHECKSUM: buffer.readUInt16BE(8),
+    HEAD    : raw.readUInt16BE(0),
+    LENGTH  : raw.readUIntBE(2, 1),
+    TYPE    : raw.readUIntBE(3, 1),
+    UNIT    : raw.readUIntBE(4, 1),
+    VH      : raw.readUIntBE(5, 1),
+    VALUE   : raw.readUInt16BE(6),
+    CHECKSUM: raw.readUInt16BE(8),
   };
   var checksum = 0;
-  for(var i=0;i<buffer.length - 2;i++){
-    checksum += buffer[i];
+  for(var i=0;i<raw.length - 2;i++){
+    checksum += raw[i];
   }
   assert.equal(data.HEAD, 0x424d, 'Invalid data header');
   assert.equal(checksum, data.CHECKSUM, 'Checksum error');
   return {
+    raw,
     data,
     type: TYPES[data.TYPE],
     unit: UNITS[data.UNIT],
@@ -77,16 +77,47 @@ function parse(buffer){
   };
 }
 
+function createReader(fn){
+  const STATE_HEADER_1 = 0x42;
+  const STATE_HEADER_2 = 0x4d;
+  const STATE_LENGTH   = 1;
+  const STATE_DATA     = 3;
+  const LEN_HEADER = 2; 
+  const LEN_LENGTH = 2;
+  var flag = STATE_HEADER_1, index, len, buffer = Buffer.alloc(0);
+  return function(chunk){
+    buffer = Buffer.concat([ buffer, chunk ]);
+    for(var i = 0; i < buffer.length; i++){
+      if(flag === STATE_HEADER_1 && buffer[i] === STATE_HEADER_1){
+        flag = STATE_HEADER_2;
+        continue;
+      }
+      if(flag === STATE_HEADER_2 && buffer[i] === STATE_HEADER_2){
+        flag = STATE_LENGTH;
+        index = ++i;
+        continue;
+      }
+      if(flag === STATE_LENGTH && buffer.length - index >= LEN_LENGTH){
+        len = buffer.readUIntBE(index, 1);
+        flag = STATE_DATA;
+        continue;
+      }
+      if(flag === STATE_DATA && buffer.length - index >= len){
+        fn(buffer.slice(index - LEN_HEADER, index + len));
+        buffer = buffer.slice(index + len);
+        flag = STATE_HEADER_1;
+      }
+    }
+  };
+}
+
 class HCHO extends SerialPort {
   constructor(dev){
     super(dev);
-    const reader = createReader({
-      LEN_LENGTH: 1
-    }, data => {
+    this.on('data', createReader(data => {
       const message = parse(data);
       this.emit('message', message);
-    });
-    this.on('data', reader);
+    }));
   }
   send(cmd, data = 0x00){
     let checksum = 0;

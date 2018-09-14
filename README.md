@@ -5,7 +5,7 @@
 ### Installation
 
 ```bash
-$ npm i dsensor
+$ npm i [-g] dsensor
 ```
 
 ### Example

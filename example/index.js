@@ -3,8 +3,7 @@ const { HCHO } = require('..');
 const hc = new HCHO("/dev/cu.SLAB_USBtoUART");
 
 hc.on('message', message => {
-  const { VALUE, VH } = message;
-  console.log(VALUE / 10 ** VH, VALUE);
+  console.log(message.toString());
 });
 
 hc.on("open", () => {
