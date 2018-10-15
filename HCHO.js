@@ -1,9 +1,5 @@
-const assert       = require('assert');
-const SerialPort   = require('serialport');
-
-const COMMANDS = {
-  QUERY: 0x01
-};
+const DSensor = require('.');
+const assert = require('assert');
 
 const TYPES = {
   0x00: 'NoSensor',
@@ -49,33 +45,40 @@ const UNITS = {
   0x05: 'Mg/m3',
 };
 
-function parse(raw){
-  const data = {
-    HEAD    : raw.readUInt16BE(0),
-    LENGTH  : raw.readUIntBE(2, 1),
-    TYPE    : raw.readUIntBE(3, 1),
-    UNIT    : raw.readUIntBE(4, 1),
-    VH      : raw.readUIntBE(5, 1),
-    VALUE   : raw.readUInt16BE(6),
-    CHECKSUM: raw.readUInt16BE(8),
-  };
-  var checksum = 0;
-  for(var i=0;i<raw.length - 2;i++){
-    checksum += raw[i];
+class HCHO extends DSensor {
+  constructor(dev){
+    super(dev, createReader);
   }
-  assert.equal(data.HEAD, 0x424d, 'Invalid data header');
-  assert.equal(checksum, data.CHECKSUM, 'Checksum error');
-  return {
-    raw,
-    data,
-    type: TYPES[data.TYPE],
-    unit: UNITS[data.UNIT],
-    value: data.VALUE / 10 ** data.VH,
-    toString(){
-      return `${this.type}: ${this.value}${this.unit}`;
+  parse(raw){
+    const data = {
+      HEAD    : raw.readUInt16BE(0),
+      LENGTH  : raw.readUIntBE(2, 1),
+      TYPE    : raw.readUIntBE(3, 1),
+      UNIT    : raw.readUIntBE(4, 1),
+      VH      : raw.readUIntBE(5, 1),
+      VALUE   : raw.readUInt16BE(6),
+      CHECKSUM: raw.readUInt16BE(8),
+    };
+    var checksum = 0;
+    for(var i=0;i<raw.length - 2;i++){
+      checksum += raw[i];
     }
-  };
+    assert.equal(data.HEAD, 0x424d, 'Invalid data header');
+    assert.equal(checksum, data.CHECKSUM, 'Checksum error');
+    return {
+      raw,
+      data,
+      type: TYPES[data.TYPE],
+      unit: UNITS[data.UNIT],
+      value: data.VALUE / 10 ** data.VH,
+      toString(){
+        return `${this.type}: ${this.value}${this.unit}`;
+      }
+    };
+  }
 }
+
+module.exports = HCHO;
 
 function createReader(fn){
   const STATE_HEADER_1 = 0x42;
@@ -110,34 +113,3 @@ function createReader(fn){
     }
   };
 }
-
-class HCHO extends SerialPort {
-  constructor(dev){
-    super(dev);
-    this.on('data', createReader(data => {
-      const message = parse(data);
-      this.emit('message', message);
-    }));
-  }
-  send(cmd, data = 0x00){
-    let checksum = 0;
-    if(typeof cmd === 'undefined')
-      throw new TypeError('cmd must be a number or string');
-    if(typeof data === 'undefined')
-      throw new TypeError('data must be a number or string');
-    if(typeof cmd === 'string'){
-      cmd = COMMANDS[`${cmd}`.toUpperCase()];
-    }
-    cmd = parseInt(cmd);
-    data = parseInt(data);
-    const packet = Buffer.alloc(7);
-    packet.writeUIntBE(0x42, 0, 1); checksum+=0x42;
-    packet.writeUIntBE(0x4d, 1, 1); checksum+=0x4d;
-    packet.writeUIntBE(cmd, 2, 1);  checksum+=cmd;
-    packet.writeUInt16BE(data, 3);  checksum+=data;
-    packet.writeUInt16BE(checksum, 5);
-    return this.write(packet);
-  }
-}
-
-module.exports = HCHO;

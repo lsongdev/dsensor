@@ -11,7 +11,7 @@ $ npm i [-g] dsensor
 ### Example
 
 ```js
-const { HCHO } = require('dsensor');
+const HCHO = require('dsensor/HCHO');
 
 const sensor = new HCHO("/dev/cu.SLAB_USBtoUART");
 

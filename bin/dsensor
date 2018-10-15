@@ -6,7 +6,7 @@ program()
 .command('help', () => {
   console.log();
   console.log('~$ dsensor <command> [options]');
-  console.log('~$ dsensor send --type=HCHO --device=/dev/cu.SLAB_USBtoUART --command=query --data=0x00');
+  console.log('~$ dsensor send --type=HCHO --device=/dev/cu.SLAB_USBtoUART --command=0x01 --data=0x00');
 })
 .command('send', ({ type, device, command, data, watch }) => {
   const Adapter = require(`../${type}`);
