@@ -14,9 +14,6 @@ class DSensor extends SerialPort {
       throw new TypeError('cmd must be a number or string');
     if(typeof data === 'undefined')
       throw new TypeError('data must be a number or string');
-    if(typeof cmd === 'string'){
-      cmd = COMMANDS[`${cmd}`.toUpperCase()];
-    }
     cmd = parseInt(cmd);
     data = parseInt(data);
     const packet = Buffer.alloc(7);
