@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const program = require('kelp-argv');
+const program = require('kelp-cli');
 
 program()
 .command('help', () => {
