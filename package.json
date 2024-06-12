@@ -12,7 +12,7 @@
   "author": "Lsong <song940@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "kelp-cli": "^0.0.1",
-    "serialport": "latest"
+    "kelp-cli": "*",
+    "serialport": "8"
   }
 }
