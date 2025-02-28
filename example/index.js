@@ -1,6 +1,6 @@
 const PMS5003 = require('../PMS5003');
 const HCHO = require('../HCHO');
-
+/*
 const hc = new HCHO("/dev/cu.SLAB_USBtoUART");
 
 hc.on('message', message => {
@@ -12,8 +12,9 @@ hc.on("open", () => {
     hc.send(0x01, 0x00);
   }, 3000)
 });
+*/
 
-const pm = new PMS5003('/dev/cu.usbserial');
+const pm = new PMS5003('/dev/cu.usbserial-21220');
 
 pm.on('message', data => {
   console.log(data);

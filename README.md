@@ -29,6 +29,10 @@ sensor.on("open", () => {
 ![](docs/PMS5003.jpg)
 ![](docs/DS-HCHO.jpg)
 
+### Golang Version
+
+<https://github.com/lsongdev/dsensor-go>
+
 ### Contributing
 - Fork this Repo first
 - Clone your Repo

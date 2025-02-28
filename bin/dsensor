@@ -12,7 +12,7 @@ program()
   const Adapter = require(`../${type}`);
   device = new Adapter(device);
   device.on('message', message => {
-    console.log(message.toString());
+    console.log("->", message);
     if(!watch) device.close();
   });
   device.on('open', () => {
